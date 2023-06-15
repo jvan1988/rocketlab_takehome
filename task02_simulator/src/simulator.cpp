@@ -11,6 +11,8 @@
 
 Simulator::Simulator(int port) : socketfd(-1) 
 {
+    this->port = port;
+
     // Create socket
     socketfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socketfd < 0) 
@@ -185,7 +187,7 @@ void Simulator::handleCommand(const string& command, const sockaddr_in& clientAd
 
 void Simulator::start() 
 {
-    cout << "Device simulation started. Listening on all ports" << endl;
+    cout << "Device simulation started. Listening on port: " << port << endl;
 
     while (true) 
     {

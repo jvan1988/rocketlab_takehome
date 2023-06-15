@@ -15,6 +15,7 @@ using namespace std;
 class Simulator {
 private:
     int socketfd;
+    int port;
     unordered_map<string, bool> started;
     unordered_map<string, mutex> startedMutex;
 
