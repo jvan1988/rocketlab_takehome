@@ -14,7 +14,7 @@ Installation
 
     Install the required dependencies using pip:
 
-    pip install pyqt5 matplotlib
+    pip install -r requirements.txt
 
 Usage
 
