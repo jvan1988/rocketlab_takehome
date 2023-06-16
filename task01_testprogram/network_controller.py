@@ -96,10 +96,27 @@ class NetworkController:
 
         if data_info[0] == "STATUS":
             if all(key in data_values for key in ["TIME", "MV", "MA"]):
-                time = int(data_values["TIME"]) / 1000
-                mv = int(data_values["MV"])
-                ma = int(data_values["MA"])
-                self.parent.plotter.update_data(time, mv, ma)
+                time = 0
+                mv = 0
+                ma = 0
+
+                try:
+                    time = int(data_values["TIME"]) / 1000
+                except ValueError:
+                    self.parent.show_message_box("STATUS ERROR!", "Time is invalid")
+
+                try:
+                    mv = int(data_values["MV"])
+                except ValueError:
+                    self.parent.show_message_box("STATUS ERROR!", "MV is invalid")
+
+                try:
+                    ma = int(data_values["MA"])
+                except ValueError:
+                    self.parent.show_message_box("STATUS ERROR!", "MA is invalid")
+
+                if time and mv and ma:
+                    self.parent.plotter.update_data(time, mv, ma)
 
             elif "STATE" in data_values:
                 if data_values["STATE"] == "IDLE":
