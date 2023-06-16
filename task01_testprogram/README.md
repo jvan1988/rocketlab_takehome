@@ -18,10 +18,12 @@ pip install -r requirements.txt
 
 ## Usage
 
-1.Run the program using the following command:
+1. Run the program using the following command:
+
 ```
 python main.py
 ```
+
 2. The Test Program GUI window will appear.
 3. Enter the IP address and port of the test device.
 4. Specify the test duration in seconds.
