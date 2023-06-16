@@ -23,7 +23,7 @@ class NetworkController:
         self.test_running = False
         self.test_start_lock = threading.Lock()
         self.test_started = False
-        self.duration = 0
+        self.duration = None
 
     def connect_device(self, ip, port):
         if self.sock is None:
@@ -86,49 +86,61 @@ class NetworkController:
     def process_data(self, data):
         print(f"Received: {data}")
 
-        if data.startswith("STATUS;"):
-            status_data = data.split(";")[1:]
-            # Extract relevant information from status_data
+        data_info = data.split(";")
+        data_values = {}
 
-            if status_data[0].startswith("TIME"):
-                time = int(status_data[0].split('=')[1]) / 1000
-                mv = int(status_data[1].split('=')[1])
-                ma = int(status_data[2].split('=')[1])
+        for entry in data_info:
+            if "=" in entry:
+                key, value = entry.split("=")
+                data_values[key] = value
 
+        if data_info[0] == "STATUS":
+            if all(key in data_values for key in ["TIME", "MV", "MA"]):
+                time = int(data_values["TIME"]) / 1000
+                mv = int(data_values["MV"])
+                ma = int(data_values["MA"])
                 self.parent.plotter.update_data(time, mv, ma)
-            elif status_data[0].startswith("STATE"):
-                if status_data[0].split('=')[1] == "IDLE":
-                    self.parent.show_message_box("Test Ended", "STATE IS IDLE")
+
+            elif "STATE" in data_values:
+                if data_values["STATE"] == "IDLE":
+                    self.parent.show_message_box("STATE IDLE", "Test has ended")
                     self.restart_app()
+                else:
+                    self.parent.show_message_box("STATE UNKNOWN!", data_values["STATE"])
 
-        elif data.startswith("ID;"):
-            self.parent.start_button.setEnabled(True)
-            self.parent.connect_button.setEnabled(False)
-            self.parent.save_button.setEnabled(False)
-            self.parent.plotter.clear_data()
-
-            model_data = data.split(";")[1:]
-            model = model_data[0].split('=')[1]
-            serial = model_data[1].split('=')[1]
-            self.parent.show_message_box("Connection Established!",
-                                         f"MODEL:{model} SERIAL:{serial}")
-
-        elif data.startswith("TEST;RESULT"):
-            result_data = data.split(";")[1:]
-            result = result_data[0].split('=')[1]
-            # Start a timer to track the test duration
-            if result == "STARTED":
-                # threading.Timer(int(self.duration), self.stop_test).start()
-                print("Test Started")
-            elif result == "STOPPED":
-                self.parent.show_message_box("Test Stopped", "The test has been stopped.")
-                # self.test_running = False
-                # self.parent.stop_button.setEnabled(False)
-                # self.parent.save_button.setEnabled(True)
             else:
-                reason = result_data[1].split('=')[1]
-                self.parent.show_message_box("Connection ERROR!",
-                                             f"Error: {result} reason: {reason}")
+                self.parent.show_message_box("STATUS ERROR!", "Unhandled Status")
+
+        elif data_info[0] == "ID":
+            if all(key in data_values for key in ["MODEL", "SERIAL"]):
+                model = data_values["MODEL"]
+                serial = data_values["SERIAL"]
+
+                self.parent.show_message_box("Connection Established!",
+                                             f"MODEL:{model} SERIAL:{serial}")
+
+                self.parent.start_button.setEnabled(True)
+                self.parent.connect_button.setEnabled(False)
+                self.parent.save_button.setEnabled(False)
+                self.parent.plotter.clear_data()
+
+            else:
+                self.parent.show_message_box("ID ERROR!", "Unhandled ID")
+
+        elif data_info[0] == "TEST":
+            if "RESULT" in data_values:
+                if data_values["RESULT"] == "STARTED":
+                    print("Test Started")
+                elif data_values["RESULT"] == "STOPPED":
+                    self.parent.show_message_box("TEST STOPPED", "The test has been stopped.")
+                elif data_values["RESULT"] == "error":
+                    if "MSG" in data_values:
+                        reason = data_values["MSG"]
+                        self.parent.show_message_box("TEST ERROR!", f"Reason: {reason}")
+                    else:
+                        self.parent.show_message_box("RESULT ERROR!", "Error with no reason")
+                else:
+                    self.parent.show_message_box("TEST ERROR!", "Unknown Result")
 
         else:
             print(f"Received Unhandled Message: {data}")

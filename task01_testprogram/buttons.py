@@ -56,7 +56,7 @@ class ConnectButton(QPushButton):
             return
 
         if is_valid_ip(ip) and is_valid_port(port):
-            self.parent.device_communication.connect_device(ip, port)
+            self.parent.network_controller.connect_device(ip, port)
         else:
             self.parent.show_message_box("Connect Failed", "Invalid IP or Port.")
 
@@ -72,7 +72,7 @@ class StartButton(QPushButton):
         duration = self.parent.duration_edit.text()
 
         if is_valid_duration(duration):
-            self.parent.device_communication.start_test(duration)
+            self.parent.network_controller.start_test(duration)
         else:
             self.parent.show_message_box("Start Failed", "Invalid Duration.")
 
@@ -85,9 +85,8 @@ class StopButton(QPushButton):
         self.setEnabled(False)
 
     def stop_test(self):
-        self.parent.device_communication.stop_test()
+        self.parent.network_controller.stop_test()
         self.parent.save_button.setEnabled(True)
-
 
 
 class SaveButton(QPushButton):

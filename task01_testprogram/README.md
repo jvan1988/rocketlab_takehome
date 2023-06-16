@@ -48,6 +48,9 @@ sudo dnf install libxcb-xinerama
 ```
 sudo pacman -Sy xcb-util-xrm
 ```
+## Considerations
+
+Matplotlib is a 3rd-party library that was used. Matplotlib is a commonly used plotting library in Python. It is an open-source library that is easy to use, highly customizable and integrates well with Python. 
 
 ## Acknowledgements
 This program was developed using Python 3 and the following libraries: PyQt5, Matplotlib.

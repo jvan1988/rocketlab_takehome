@@ -30,7 +30,7 @@ class CommunicationApp(QMainWindow):
         self.create_input_fields()
         self.create_buttons()
 
-        self.device_communication = NetworkController.instance(self)
+        self.network_controller = NetworkController.instance(self)
         self.plotter = Plotter(self.figure, self.canvas)
         self.pdf_exporter = PDFExporter()
 
@@ -73,5 +73,4 @@ class CommunicationApp(QMainWindow):
         self.pdf_exporter.export_to_pdf(self.figure, "test_results.pdf")
 
     def closeEvent(self, event):
-        self.device_communication.test_running = False
         event.accept()
