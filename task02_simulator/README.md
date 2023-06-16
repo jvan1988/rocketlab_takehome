@@ -20,7 +20,7 @@ Open a terminal and navigate to the directory where the simulator executable is 
 
 Run the following command to start the simulator:
 
-        ./simulator [port]
+    ./simulator [port]
 
 Replace **[port]** with the desired port number (e.g., 12345). If no port is specified, the default port **8888** will be used.
 
